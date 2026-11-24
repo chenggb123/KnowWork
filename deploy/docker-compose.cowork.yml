@@ -1,0 +1,31 @@
+# cowork 桌面端服务端扩展（部署覆盖文件，不改 KnowWork 核心源码）：
+# bootstrap/api/worker/model-gateway 换成本地派生镜像 knowwork-cowork-server:v0.1.2
+# （基础镜像 + pip 安装 cowork_extension，见 cowork 仓库 server-extension/Dockerfile）。
+# api/worker 加 COWORK_DOWNLOAD_DIR 与共享命名卷，放桌面安装包/更新包供 /api/cowork/dl/{name} 下载。
+# 启用：.env 的 COMPOSE_FILE 追加 ;docker-compose.cowork.yml（Windows 分隔符）。
+# 回滚：去掉该段后 up -d 即回原镜像；本文件与 .env 的该行是唯一改动。
+services:
+  bootstrap:
+    image: knowwork-cowork-server:v0.1.2
+    pull_policy: never
+  api:
+    image: knowwork-cowork-server:v0.1.2
+    pull_policy: never
+    environment:
+      COWORK_DOWNLOAD_DIR: /opt/cowork-downloads
+    volumes:
+      - cowork-downloads:/opt/cowork-downloads
+  worker:
+    image: knowwork-cowork-server:v0.1.2
+    pull_policy: never
+    environment:
+      COWORK_DOWNLOAD_DIR: /opt/cowork-downloads
+    volumes:
+      - cowork-downloads:/opt/cowork-downloads
+  model-gateway:
+    image: knowwork-cowork-server:v0.1.2
+    pull_policy: never
+
+volumes:
+  cowork-downloads:
+    name: ${KNOWWORK_VOLUME_PREFIX:-knowwork}_cowork-downloads
