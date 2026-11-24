@@ -1,7 +1,8 @@
 # KnowWork 桌面客户端（Windows）设计文档
 
 日期：2026-11-24
-状态：待评审
+状态：已作废——方向改为 cowork 品牌独立安装包（重打包官方 DSH 桌面壳 + DSH 扩展包），
+新设计见 C:\Users\cheng\.cowork\docs\superpowers\specs\2026-11-24-cowork-desktop-design.md
 范围：开源 KnowWork（v0.1.2，DSH 0.2.2-rc.5）之上的桌面客户端，团队分发，Windows 单平台。
 
 ## 1. 意图与背景
