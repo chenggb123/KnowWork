@@ -10,6 +10,11 @@ ARG NGINX_IMAGE=nginxinc/nginx-unprivileged:1.28-alpine
 # hadolint ignore=DL3006,DL3029
 FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS web
 WORKDIR /web
+# 前端插槽包入口（导出 install(register)）：web/vite.config.ts 把它给别名 @knowwork/extensions，不传就是开源的空实现。
+# 路径是相对构建时的 web 项目根（这里是 /web）的写法：/... 开头的 vite 会接到项目根上。
+# cowork 的桌面端插槽包由 deploy/build-gateway-cowork.ps1 先拷到 web/.extensions/desktop-web，随下面 COPY web/ 进镜像。
+ARG KNOWWORK_WEB_EXTENSIONS=
+ENV KNOWWORK_WEB_EXTENSIONS=${KNOWWORK_WEB_EXTENSIONS}
 COPY web/package.json web/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund

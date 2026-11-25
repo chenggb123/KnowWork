@@ -1,0 +1,4 @@
+这层目录放构建时临时拷进来的前端插槽包（web 镜像构建用，不提交内容）。
+构建带「本机」入口的网关镜像时，deploy/build-gateway-cowork.ps1 把 cowork 仓库的
+desktop/web-extension 拷到这里的 desktop-web/，Dockerfile 里 `COPY web/ ./` 会带上，
+vite 经 KNOWWORK_WEB_EXTENSIONS 指向它的入口。

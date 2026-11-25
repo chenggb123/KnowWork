@@ -2,6 +2,8 @@
 # bootstrap/api/worker/model-gateway 换成本地派生镜像 knowwork-cowork-server:v0.1.2
 # （基础镜像 + pip 安装 cowork_extension，见 cowork 仓库 server-extension/Dockerfile）。
 # api/worker 加 COWORK_DOWNLOAD_DIR 与共享命名卷，放桌面安装包/更新包供 /api/cowork/dl/{name} 下载。
+# gateway 换成本地构建的 knowwork-gateway-cowork:v0.1.2：web 里多打一份桌面端插槽包（@knowwork/desktop-web），
+# 只在 Electron 桌面应用内有「本机」执行入口；构建用 deploy/build-gateway-cowork.ps1（先把插槽包拷进 web/.extensions）。
 # 启用：.env 的 COMPOSE_FILE 追加 ;docker-compose.cowork.yml（Windows 分隔符）。
 # 回滚：去掉该段后 up -d 即回原镜像；本文件与 .env 的该行是唯一改动。
 services:
@@ -25,6 +27,16 @@ services:
   model-gateway:
     image: knowwork-cowork-server:v0.1.2
     pull_policy: never
+  gateway:
+    image: knowwork-gateway-cowork:v0.1.2
+    pull_policy: never
+    build:
+      # 构建上下文是仓库根（本文件在 deploy/ 下）：Dockerfile 从仓库根 COPY web/ ./，插槽包在 web/.extensions/desktop-web
+      context: ..
+      dockerfile: deploy/docker/gateway.Dockerfile
+      args:
+        # vite 的 @knowwork/extensions 别名：/ 开头是相对 web 项目根（镜像里是 /web）的路径，指向拷进来的插槽包入口
+        KNOWWORK_WEB_EXTENSIONS: /.extensions/desktop-web/src/index.ts
 
 volumes:
   cowork-downloads:

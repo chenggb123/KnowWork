@@ -9,3 +9,7 @@ deploy/.env
 server/data/
 __pycache__/
 .gstack/
+
+# 构建时临时拷进来的前端插槽包（cowork 仓库的 desktop/web-extension，见 deploy/build-gateway-cowork.ps1）：
+web/.extensions/*
+!web/.extensions/.gitkeep
