@@ -5,6 +5,9 @@
 # gateway 换成本地构建的 knowwork-gateway-cowork:v0.1.2：web 里多打一份桌面端插槽包（@knowwork/desktop-web），
 # 只在 Electron 桌面应用内有「本机」执行入口；构建用 deploy/build-gateway-cowork.ps1（先把插槽包拷进 web/.extensions）。
 # 启用：.env 的 COMPOSE_FILE 追加 ;docker-compose.cowork.yml（Windows 分隔符）。
+# 现网（2026-11-25）已切换：.env 的 COMPOSE_FILE 含本文件，`docker compose -f docker-compose.yml
+# -f docker-compose.sandbox.yml -f docker-compose.cowork.yml up -d gateway` 只重建 gateway 到上面这个本地镜像
+# （构建断言 + /login、/ready 探测 + 普通浏览器无「本机」入口的验证记录见 cowork 仓库 desktop/docs/verify-D.md）。
 # 回滚：去掉该段后 up -d 即回原镜像；本文件与 .env 的该行是唯一改动。
 services:
   bootstrap:
