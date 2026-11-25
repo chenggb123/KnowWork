@@ -1,8 +1,11 @@
 # KnowWork 桌面客户端（Windows）设计文档
 
 日期：2026-11-24
-状态：已作废——方向改为 cowork 品牌独立安装包（重打包官方 DSH 桌面壳 + DSH 扩展包），
-新设计见 C:\Users\cheng\.cowork\docs\superpowers\specs\2026-11-24-cowork-desktop-design.md
+状态：**生效**（2026-11-25 恢复）。曾短暂转向「重打包官方 DSH 桌面壳」（见
+C:\Users\cheng\.cowork\docs\superpowers\specs\2026-11-24-cowork-desktop-design.md），
+该方向已作废：**终端不做 DSH 应用品牌壳**，回到本设计——KnowWork 品牌 Electron 客户端，
+内嵌 KnowWork 网页、设备会话回传服务端统一存储；**本机执行运行时内部仍用 DSH**
+（KnowWork 同款内核，作为 Electron 主进程管理的 Node 子进程，不重打包 DSH 桌面壳）。
 范围：开源 KnowWork（v0.1.2，DSH 0.2.2-rc.5）之上的桌面客户端，团队分发，Windows 单平台。
 
 ## 1. 意图与背景
@@ -211,6 +214,18 @@
 - 随包 Node 24 运行时（宿主子进程用，不依赖用户机器装 Node）。
 - 签名：本期无证书，安装说明写明 SmartScreen 提示；预留签名配置（公司证书到位即启用）。
 - 更新包与 feed 由服务端扩展提供；版本号与服务端扩展版本配套。
+
+## 5.6 已有资产复用（2026-11-25 盘点）
+
+短暂试过的「DSH 品牌壳 + bundle」方向虽作废，其产出有可复用部分：
+
+| 资产 | 位置 | 处置 |
+|---|---|---|
+| 服务端扩展（OAuth 客户端/令牌交换/下载路由） | `C:\Users\cheng\.cowork\server-extension`（22 测试，已部署本地 KnowWork） | **复用**：改 client_id/名称为 `kw-desktop`；下载路由直接用作安装包托管；新增设备会话/注册表/web-session/更新 feed |
+| OAuth PKCE + 令牌刷新逻辑 | `C:\Users\cheng\.cowork\bundle\src\login.mjs`（61 测试，含 settled/dispose 竞态与超时修复） | **移植**到 Electron 主进程（TS）：回环回调校验、state timingSafeEqual、锁内刷新、AbortSignal 超时 |
+| DSH/KnowWork API 笔记 | `C:\Users\cheng\.cowork\bundle\docs\api-notes.md` | **保留**：credentials/llm-pi-ai/OAuth/网关/令牌交换的确切签名与路径 |
+| 贴牌流水线 | `C:\Users\cheng\.cowork\rebrand`（41 测试） | **作废**（不重打包 DSH 壳） |
+| DSH bundle（knowwork-login/models） | `C:\Users\cheng\.cowork\bundle` | **作废**为 DSH 插件形态；逻辑移植，包本体不再使用 |
 
 ## 6. 里程碑（我的划分，可调整）
 
