@@ -6,7 +6,8 @@
   插槽包（@knowwork/desktop-web）在 cowork 仓库，网关镜像却从 knowwork 仓库的 web/ 构建：
   1. 把 cowork 仓库的 desktop/web-extension 整个拷到 knowwork 的 web/.extensions/desktop-web（gitignore 掉的临时目录）；
   2. 用 docker-compose.yml + docker-compose.cowork.yml 构建 gateway（KNOWWORK_WEB_EXTENSIONS 由 compose 的 build args 传）；
-  3. 断言镜像里的前端产物带插槽包（能 grep 到 knowwork-desktop-web）——没带上就是构建接线坏了，直接失败。
+  3. 断言镜像里的前端产物带插槽包（能 grep 到插槽包的桥面方法名 chooseWorkspace，见下面的 $marker）——
+     没带上就是构建接线坏了，直接失败。
 
   普通浏览器里插槽包不登记任何来源（没有 window.knowwork 桥），「本机」入口只在 Electron 桌面应用内出现。
   只构建镜像、不重启部署：替换正在跑的 gateway 由发布步骤（docker compose up -d gateway）负责。
@@ -35,7 +36,10 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $deployDir = Join-Path $repoRoot 'deploy'
 $source = Join-Path $CoworkRepo 'desktop\web-extension'
 $target = Join-Path $repoRoot 'web\.extensions\desktop-web'
-$marker = 'knowwork-desktop-web'
+# 产物里的记号：插槽包 bridge.ts 的桥面方法名（校验 window.knowwork.local 时逐个比对，一定进产物）。
+# 用纯 ASCII 标识符而不是中文文案：压缩后的字符串更稳，也不会因为文案改了就把构建断言弄红；
+# 核心 web 源码里没有这个名字，命中即说明 KNOWWORK_WEB_EXTENSIONS 的接线真的生效了。
+$marker = 'chooseWorkspace'
 
 if (-not (Test-Path (Join-Path $source 'src\index.ts'))) {
   throw "找不到插槽包：$source（用 -CoworkRepo 指定 cowork 仓库路径）"
